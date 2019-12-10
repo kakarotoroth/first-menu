@@ -1,0 +1,109 @@
+<html>
+<head>
+    <title>threejs - models</title>
+
+    <style>
+    	body{
+    		margin: 0;
+    		overflow: hidden;
+    	}
+    </style>
+</head>
+<body>
+
+    <canvas id="myCanvas"></canvas>
+
+    <script src="three.js"></script>
+
+    <script>
+
+    var renderer,
+    	scene,
+    	camera,
+    	myCanvas = document.getElementById('myCanvas');
+
+    //RENDERER
+    renderer = new THREE.WebGLRenderer({
+      canvas: myCanvas, 
+      antialias: true
+    });
+    renderer.setClearColor(0x000000);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    //CAMERA
+    camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+    //SCENE
+    scene = new THREE.Scene();
+
+    //LIGHTS
+    var light = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(light);
+
+    var light2 = new THREE.PointLight(0xffffff, 0.5);
+    scene.add(light2);
+  
+    //personaje
+    var loader = new THREE.JSONLoader();
+    loader.load('kyo.json', handle_load);
+    
+
+    //MATERIAL
+    function handle_load(geometry,materials) {
+        const loader = new THREE.TextureLoader();
+        
+        const material = new THREE.MeshBasicMaterial({
+            map: loader.load('c14_falco_cloth_D_l.png'),
+            
+        });
+        const material2 = new THREE.MeshBasicMaterial({
+            map: loader.load('c14_falco_hair_D_l.png'),
+            
+        });
+        mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+        mesh.position.z = -4;
+        mesh.position.y = -1;
+    }
+
+
+    //RENDER LOOP
+    render();
+
+
+    function render() {
+
+    	renderer.render(scene, camera);
+
+    	requestAnimationFrame(render);
+    }
+
+
+
+
+    var loadingManager = new THREE.LoadingManager();
+var ObjLoader = new THREE.OBJLoader(loadingManager);
+var textureLoader =  new THREE.TextureLoader(loadingManager);
+//Material 1 with first texture
+var material = new THREE.MeshLambertMaterial({map: textureLoader.load('https://dl.dropboxusercontent.com/s/nvnacip8fhlrvm4/BoxUV.png?dl=0')});
+//Material 2 with second texture
+var material2 = new THREE.MeshLambertMaterial({map:
+textureLoader.load('https://i.imgur.com/311w7oZ.png')});
+ObjLoader.load(
+    'https://dl.dropboxusercontent.com/s/hiazgei0rxeirr4/cabinet30.obj?dl=0',
+    function ( object ) {
+        var geo = object.children[0].geometry;
+        var mats = [material, material2];
+        //These are just some random groups to demonstrate multi material, you need to set these up so they actually work for your object, either in code or in your 3D editor
+        geo.addGroup(0,geo.getAttribute("position").count/2,0);
+        geo.addGroup(geo.getAttribute("position").count/2,
+        geo.getAttribute("position").count/2,1);
+        //Mesh with multiple materials for material parameter
+        obj = new THREE.Mesh(geo, mats);
+        obj.position.y = 3;
+    });
+
+    </script>
+</body>
+</html>
